@@ -83,6 +83,8 @@ class QDJANGO_DB_EXPORT QDjangoQuerySetPrivate
 public:
     QDjangoQuerySetPrivate(const char *modelName);
 
+    const QByteArray &modelName() const;
+
     void addFilter(const QDjangoWhere &where);
     QDjangoWhere resolvedWhere(const QSqlDatabase &db) const;
     bool sqlDelete();

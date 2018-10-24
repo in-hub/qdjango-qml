@@ -287,6 +287,7 @@ public:
     typedef const_iterator ConstIterator;
 
     QDjangoQuerySet();
+    QDjangoQuerySet(const char *tableName);
     QDjangoQuerySet(const QDjangoQuerySet<T> &other);
     ~QDjangoQuerySet();
 
@@ -329,6 +330,14 @@ template <class T>
 QDjangoQuerySet<T>::QDjangoQuerySet()
 {
     d = new QDjangoQuerySetPrivate(T::staticMetaObject.className());
+}
+
+/** Constructs a new queryset.
+ */
+template <class T>
+QDjangoQuerySet<T>::QDjangoQuerySet(const char* tableName)
+{
+    d = new QDjangoQuerySetPrivate(tableName);
 }
 
 /** Constructs a copy of \a other.
@@ -421,7 +430,7 @@ typename QDjangoQuerySet<T>::const_iterator QDjangoQuerySet<T>::end() const
 template <class T>
 QDjangoQuerySet<T> QDjangoQuerySet<T>::all() const
 {
-    QDjangoQuerySet<T> other;
+    QDjangoQuerySet<T> other( d->modelName() );
     other.d->lowMark = d->lowMark;
     other.d->highMark = d->highMark;
     other.d->orderBy = d->orderBy;

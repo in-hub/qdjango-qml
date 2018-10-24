@@ -231,7 +231,7 @@ static bool stringToBool(const QString &value)
 class QDjangoMetaModelPrivate : public QSharedData
 {
 public:
-    QString className;
+    QByteArray className;
     QList<QDjangoMetaField> localFields;
     QMap<QByteArray, QByteArray> foreignFields;
     QByteArray primaryKey;
@@ -380,6 +380,154 @@ QDjangoMetaModel::QDjangoMetaModel(const QMetaObject *meta)
 
 }
 
+
+/*!
+    Constructs a new QDjangoMetaModel by inspecting the given \a QObject instance.
+*/
+QDjangoMetaModel::QDjangoMetaModel(const QObject *object)
+    : d(new QDjangoMetaModelPrivate)
+{
+    d->className = object->objectName().toUtf8();
+    d->table = object->objectName().toLower();
+
+    // parse table options
+    const auto metaProp = object->property( "__meta__" );
+    if( metaProp.isValid() && metaProp.toString().size() > 0 )
+    {
+        QMap<QString, QString> options = parseOptions(metaProp.toByteArray());
+        QMapIterator<QString, QString> option(options);
+        while (option.hasNext()) {
+            option.next();
+            if (option.key() == QLatin1String("db_table"))
+                d->table = option.value();
+            else if (option.key() == QLatin1String("unique_together"))
+                d->uniqueTogether = option.value().toLatin1().split(',');
+        }
+    }
+
+    const auto dynPropNames = object->dynamicPropertyNames();
+    for( const auto& dynPropName : dynPropNames )
+    {
+        if( dynPropName == QByteArrayLiteral("pk") || dynPropName == QByteArrayLiteral("__meta__" ) ||
+                dynPropName.endsWith( QByteArrayLiteral("__info") ) )
+        {
+            continue;
+        }
+
+        const auto dynProp = object->property( dynPropName );
+        const QString typeName = dynProp.typeName();
+
+        // parse field options
+        bool autoIncrementOption = false;
+        QString dbColumnOption;
+        bool dbIndexOption = false;
+        bool ignoreFieldOption = false;
+        int maxLengthOption = 0;
+        bool primaryKeyOption = false;
+        bool nullOption = false;
+        bool uniqueOption = false;
+        bool blankOption = false;
+        ForeignKeyConstraint deleteConstraint = NoAction;
+        const auto dynPropInfoName = dynPropName + QByteArrayLiteral("__info");
+        const auto infoProp = object->property( dynPropInfoName );
+        if( infoProp.isValid() )
+        {
+            QMap<QString, QString> options = parseOptions( infoProp.toByteArray() );
+            QMapIterator<QString, QString> option(options);
+            while (option.hasNext()) {
+                option.next();
+                const QString key = option.key();
+                const QString value = option.value();
+                if (key == QLatin1String("auto_increment"))
+                    autoIncrementOption = stringToBool(value);
+                else if (key == QLatin1String("db_column"))
+                    dbColumnOption = value;
+                else if (key == QLatin1String("db_index"))
+                    dbIndexOption = stringToBool(value);
+                else if (key == QLatin1String("ignore_field"))
+                    ignoreFieldOption = stringToBool(value);
+                else if (key == QLatin1String("max_length"))
+                    maxLengthOption = value.toInt();
+                else if (key == QLatin1String("null"))
+                    nullOption = stringToBool(value);
+                else if (key == QLatin1String("primary_key"))
+                    primaryKeyOption = stringToBool(value);
+                else if (key == QLatin1String("unique"))
+                    uniqueOption = stringToBool(value);
+                else if (key == QLatin1String("blank"))
+                    blankOption = stringToBool(value);
+                else if (option.key() == "on_delete") {
+                    if (value.toLower() == "cascade")
+                        deleteConstraint = Cascade;
+                    else if (value.toLower() == "set_null")
+                        deleteConstraint = SetNull;
+                    else if (value.toLower() == "restrict")
+                        deleteConstraint = Restrict;
+                }
+            }
+        }
+
+        // ignore field
+        if (ignoreFieldOption)
+            continue;
+
+        // foreign field
+        if (typeName.endsWith(QLatin1Char('*'))) {
+            const QByteArray fkName = dynPropName;
+            const QByteArray fkModel = typeName.left(typeName.size() - 1).toLatin1();
+            d->foreignFields.insert(fkName, fkModel);
+
+            QDjangoMetaField field;
+            field.d->name = fkName + "_id";
+            // FIXME : the key is not necessarily an INTEGER field, we should
+            // probably perform a lookup on the foreign model, but are we sure
+            // it is already registered?
+            field.d->type = QVariant::Int;
+            field.d->foreignModel = fkModel;
+            field.d->db_column = dbColumnOption.isEmpty() ? QString::fromLatin1(field.d->name) : dbColumnOption;
+            field.d->index = true;
+            field.d->null = nullOption;
+            field.d->deleteConstraint = deleteConstraint;
+            d->localFields << field;
+            continue;
+        }
+
+        // local field
+        QDjangoMetaField field;
+        field.d->name = dynPropName;
+        field.d->type = dynProp.type();
+        field.d->db_column = dbColumnOption.isEmpty() ? QString::fromLatin1(field.d->name) : dbColumnOption;
+        field.d->maxLength = maxLengthOption;
+        field.d->null = nullOption;
+        if (primaryKeyOption) {
+            field.d->autoIncrement = autoIncrementOption;
+            d->primaryKey = field.d->name;
+        } else if (uniqueOption) {
+            field.d->unique = true;
+        } else if (blankOption) {
+            field.d->blank = true;
+        } else if (dbIndexOption) {
+            field.d->index = true;
+        }
+
+        d->localFields << field;
+    }
+
+    // automatic primary key
+    if (d->primaryKey.isEmpty()) {
+        QDjangoMetaField field;
+        field.d->name = "id";
+        field.d->type = QVariant::Int;
+        field.d->db_column = QLatin1String("id");
+        field.d->autoIncrement = true;
+        d->localFields.prepend(field);
+        d->primaryKey = field.d->name;
+    }
+
+}
+
+
+
 /*!
     Constructs a copy of \a other.
 */
@@ -395,7 +543,7 @@ QDjangoMetaModel::~QDjangoMetaModel()
 {
 }
 
-QString QDjangoMetaModel::className() const
+QByteArray QDjangoMetaModel::className() const
 {
     return d->className;
 }
@@ -811,7 +959,7 @@ QString QDjangoMetaModel::table() const
 bool QDjangoMetaModel::remove(QObject *model) const
 {
     const QVariant pk = model->property(d->primaryKey);
-    QDjangoQuerySetPrivate qs(model->metaObject()->className());
+    QDjangoQuerySetPrivate qs(className());
     qs.addFilter(QDjangoWhere(QLatin1String("pk"), QDjangoWhere::Equals, pk));
     return qs.sqlDelete();
 }
@@ -846,7 +994,7 @@ bool QDjangoMetaModel::save(QObject *model) const
             }
 
             // perform UPDATE
-            QDjangoQuerySetPrivate qs(model->metaObject()->className());
+            QDjangoQuerySetPrivate qs(className());
             qs.addFilter(QDjangoWhere(QLatin1String("pk"), QDjangoWhere::Equals, pk));
             return qs.sqlUpdate(fields) != -1;
         }
@@ -862,7 +1010,7 @@ bool QDjangoMetaModel::save(QObject *model) const
     }
 
     // perform INSERT
-    QDjangoQuerySetPrivate qs(model->metaObject()->className());
+    QDjangoQuerySetPrivate qs(className());
     if (primaryKey.d->autoIncrement) {
         // fetch autoincrement pk
         QVariant insertId;

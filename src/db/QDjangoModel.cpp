@@ -35,7 +35,7 @@ QDjangoModel::QDjangoModel(QObject *parent)
  */
 QVariant QDjangoModel::pk() const
 {
-    const QDjangoMetaModel metaModel = QDjango::metaModel(metaObject()->className());
+    const QDjangoMetaModel metaModel = QDjango::metaModel(className());
     return property(metaModel.primaryKey());
 }
 
@@ -45,8 +45,18 @@ QVariant QDjangoModel::pk() const
  */
 void QDjangoModel::setPk(const QVariant &pk)
 {
-    const QDjangoMetaModel metaModel = QDjango::metaModel(metaObject()->className());
+    const QDjangoMetaModel metaModel = QDjango::metaModel(className());
     setProperty(metaModel.primaryKey(), pk);
+}
+
+QByteArray QDjangoModel::className() const
+{
+    if( objectName().isEmpty() == false )
+    {
+        return objectName().toUtf8();
+    }
+
+    return metaObject()->className();
 }
 
 /** Retrieves the QDjangoModel pointed to by the given foreign-key.
@@ -55,7 +65,7 @@ void QDjangoModel::setPk(const QVariant &pk)
  */
 QObject *QDjangoModel::foreignKey(const char *name) const
 {
-    const QDjangoMetaModel metaModel = QDjango::metaModel(metaObject()->className());
+    const QDjangoMetaModel metaModel = QDjango::metaModel(className());
     return metaModel.foreignKey(this, name);
 }
 
@@ -68,7 +78,7 @@ QObject *QDjangoModel::foreignKey(const char *name) const
  */
 void QDjangoModel::setForeignKey(const char *name, QObject *value)
 {
-    const QDjangoMetaModel metaModel = QDjango::metaModel(metaObject()->className());
+    const QDjangoMetaModel metaModel = QDjango::metaModel(className());
     metaModel.setForeignKey(this, name, value);
 }
 
@@ -78,7 +88,7 @@ void QDjangoModel::setForeignKey(const char *name, QObject *value)
  */
 bool QDjangoModel::remove()
 {
-    const QDjangoMetaModel metaModel = QDjango::metaModel(metaObject()->className());
+    const QDjangoMetaModel metaModel = QDjango::metaModel(className());
     return metaModel.remove(this);
 }
 
@@ -88,7 +98,7 @@ bool QDjangoModel::remove()
  */
 bool QDjangoModel::save()
 {
-    const QDjangoMetaModel metaModel = QDjango::metaModel(metaObject()->className());
+    const QDjangoMetaModel metaModel = QDjango::metaModel(className());
     return metaModel.save(this);
 }
 
@@ -96,8 +106,8 @@ bool QDjangoModel::save()
  */
 QString QDjangoModel::toString() const
 {
-    const QDjangoMetaModel metaModel = QDjango::metaModel(metaObject()->className());
+    const QDjangoMetaModel metaModel = QDjango::metaModel(className());
     const QByteArray pkName = metaModel.primaryKey();
-    return QString::fromLatin1("%1(%2=%3)").arg(QString::fromLatin1(metaObject()->className()), QString::fromLatin1(pkName), property(pkName).toString());
+    return QString::fromLatin1("%1(%2=%3)").arg(QString::fromLatin1(className()), QString::fromLatin1(pkName), property(pkName).toString());
 }
 

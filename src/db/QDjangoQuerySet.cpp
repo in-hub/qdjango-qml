@@ -235,6 +235,11 @@ QDjangoQuerySetPrivate::QDjangoQuerySetPrivate(const char *modelName)
 {
 }
 
+const QByteArray &QDjangoQuerySetPrivate::modelName() const
+{
+	return m_modelName;
+}
+
 void QDjangoQuerySetPrivate::addFilter(const QDjangoWhere &where)
 {
     // it is not possible to add filters once a limit has been set

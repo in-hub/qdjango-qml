@@ -87,6 +87,8 @@ public:
     QVariant pk() const;
     void setPk(const QVariant &pk);
 
+    QByteArray className() const;
+
 public slots:
     bool remove();
     bool save();

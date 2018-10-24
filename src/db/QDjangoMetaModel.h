@@ -66,6 +66,7 @@ class QDJANGO_DB_EXPORT QDjangoMetaModel
 {
 public:
     QDjangoMetaModel(const QMetaObject *model = 0);
+    QDjangoMetaModel(const QObject *model);
     QDjangoMetaModel(const QDjangoMetaModel &other);
     ~QDjangoMetaModel();
     QDjangoMetaModel& operator=(const QDjangoMetaModel &other);
@@ -83,7 +84,7 @@ public:
     QObject *foreignKey(const QObject *model, const char *name) const;
     void setForeignKey(QObject *model, const char *name, QObject *value) const;
 
-    QString className() const;
+    QByteArray className() const;
     QDjangoMetaField localField(const char *name) const;
     QList<QDjangoMetaField> localFields() const;
     QMap<QByteArray, QByteArray> foreignFields() const;

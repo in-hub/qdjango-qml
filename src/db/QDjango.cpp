@@ -313,6 +313,16 @@ QDjangoMetaModel QDjango::metaModel(const char *name)
     return QDjangoMetaModel();
 }
 
+
+QDjangoMetaModel QDjango::registerModel(const QObject *object)
+{
+    const auto name = object->objectName().toUtf8();
+    if (name.isEmpty() == false && !globalMetaModels.contains(name))
+        globalMetaModels.insert(name, QDjangoMetaModel(object));
+    return globalMetaModels[name];
+}
+
+
 QDjangoMetaModel QDjango::registerModel(const QMetaObject *meta)
 {
     const QByteArray name = meta->className();

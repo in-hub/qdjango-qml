@@ -46,6 +46,8 @@ public:
     template <class T>
     static QDjangoMetaModel registerModel();
 
+    static QDjangoMetaModel registerModel(const QObject *object);
+
 private:
     static QDjangoMetaModel registerModel(const QMetaObject *meta);
     static QDjangoMetaModel metaModel(const char *name);
