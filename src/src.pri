@@ -2,6 +2,8 @@ TEMPLATE = lib
 CONFIG += $$QDJANGO_LIBRARY_TYPE
 VERSION = $$QDJANGO_VERSION
 
+CONFIG += ltcg
+
 # Installation
 headers.files = $$HEADERS
 target.path = $$[QT_INSTALL_LIBS]
