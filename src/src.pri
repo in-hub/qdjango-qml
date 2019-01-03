@@ -4,7 +4,7 @@ VERSION = $$QDJANGO_VERSION
 
 # Installation
 headers.files = $$HEADERS
-target.path = $$PREFIX/$$LIBDIR
+target.path = $$[QT_INSTALL_LIBS]
 INSTALLS += headers target
 
 # pkg-config support
