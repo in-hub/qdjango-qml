@@ -24,3 +24,7 @@ equals(QDJANGO_PROFILE,true) {
     QMAKE_LIBS += -lgcov
     QMAKE_CLEAN += *.gcda *.gcov *.gcno
 }
+
+features.files = *prf
+features.path = $$[QT_HOST_DATA]/mkspecs/features
+INSTALLS += features
