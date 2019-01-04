@@ -3,6 +3,8 @@ include(../../qdjango.pri)
 QT -= gui
 QT += sql
 
+DEFINES += QT_NO_CAST_FROM_ASCII QT_NO_CAST_TO_ASCII
+
 DEFINES += QDJANGO_DB_BUILD
 
 TARGET = qdjango-db

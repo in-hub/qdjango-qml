@@ -455,7 +455,7 @@ int QDjangoQuerySet<T>::count() const
     if (d->hasResults)
         return d->properties.size();
 
-    QVariant count(aggregate(QDjangoWhere::COUNT,"*"));
+    QVariant count(aggregate(QDjangoWhere::COUNT,QStringLiteral("*")));
     return count.isValid() ? count.toInt() : -1;
 }
 

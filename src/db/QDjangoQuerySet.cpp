@@ -80,7 +80,7 @@ QString QDjangoCompiler::databaseColumn(const QString &name)
                 qWarning() << "Invalid field lookup" << name;
                 return QString();
             }
-            rev.rightHandKey = foreignModel.primaryKey();
+            rev.rightHandKey = QString::fromLatin1(foreignModel.primaryKey());
             reverseModelRefs[modelPath] = rev;
         } else {
             foreignModel = QDjango::metaModel(model.foreignFields()[fk]);
@@ -89,7 +89,7 @@ QString QDjangoCompiler::databaseColumn(const QString &name)
 
         // store reference
         modelRef = referenceModel(modelPath, &foreignModel, foreignNullable);
-        modelName = fk;
+        modelName = QString::fromLatin1(fk);
 
         model = foreignModel;
         bits.takeFirst();
@@ -117,14 +117,14 @@ QStringList QDjangoCompiler::fieldNames(bool recurse, const QStringList *fields,
     foreach (const QByteArray &fkName, metaModel->foreignFields().keys()) {
         QDjangoMetaModel metaForeign = QDjango::metaModel(metaModel->foreignFields()[fkName]);
         bool nullableForeign = metaModel->localField(fkName + QByteArray("_id")).isNullable();
-        QString fkS(fkName);
-        if ( (fields != 0) && (fields->contains(fkS) ) )
+        QString fkS(QString::fromLatin1(fkName));
+        if ( (fields != nullptr) && (fields->contains(fkS) ) )
         {
-            QStringList nsl = fields->filter(QRegExp("^" + fkS + "__")).replaceInStrings(QRegExp("^" + fkS + "__"),"");
+            QStringList nsl = fields->filter(QRegExp(QLatin1String("^") + fkS + QLatin1String("__"))).replaceInStrings(QRegExp(QLatin1String("^") + fkS + QLatin1String("__")),QString());
             columns += fieldNames(recurse, &nsl, &metaForeign, pathPrefix + QString::fromLatin1(fkName), nullableForeign);
         }
 
-        if (fields == 0)
+        if (fields == nullptr)
         {
             columns += fieldNames(recurse, 0, &metaForeign, pathPrefix + QString::fromLatin1(fkName), nullableForeign);
         }
@@ -141,14 +141,14 @@ QString QDjangoCompiler::fromSql()
         QString leftHandColumn, rightHandColumn;
         if (reverseModelRefs.contains(name)) {
             const QDjangoReverseReference &rev = reverseModelRefs[name];
-            leftHandColumn = ref.tableReference + "." + driver->escapeIdentifier(rev.leftHandKey, QSqlDriver::FieldName);;
+            leftHandColumn = ref.tableReference + QLatin1Char('.') + driver->escapeIdentifier(rev.leftHandKey, QSqlDriver::FieldName);;
             rightHandColumn = databaseColumn(rev.rightHandKey);
         } else {
             leftHandColumn = databaseColumn(name + QLatin1String("__pk"));
             rightHandColumn = databaseColumn(name + QLatin1String("_id"));
         }
         from += QString::fromLatin1(" %1 %2 %3 ON %4 = %5")
-            .arg(ref.nullable ? "LEFT OUTER JOIN" : "INNER JOIN")
+            .arg(ref.nullable ? QLatin1String("LEFT OUTER JOIN") : QLatin1String("INNER JOIN"))
             .arg(driver->escapeIdentifier(ref.metaModel.table(), QSqlDriver::TableName))
             .arg(ref.tableReference)
             .arg(leftHandColumn)
@@ -184,7 +184,7 @@ QString QDjangoCompiler::orderLimitSql(const QStringList &orderBy, int lowMark, 
 
     if (databaseType == QDjangoDatabase::MSSqlServer) {
         if (limit.isEmpty() && (highMark > 0 || lowMark > 0))
-            limit += QLatin1String(" ORDER BY ") + databaseColumn(baseModel.primaryKey());
+            limit += QLatin1String(" ORDER BY ") + databaseColumn(QLatin1String(baseModel.primaryKey()));
 
         if (lowMark > 0 || (lowMark == 0 && highMark > 0)) {
             limit += QLatin1String(" OFFSET ") + QString::number(lowMark);
@@ -192,7 +192,7 @@ QString QDjangoCompiler::orderLimitSql(const QStringList &orderBy, int lowMark, 
         }
 
         if (highMark > 0)
-            limit += QString(" FETCH NEXT %1 ROWS ONLY").arg(highMark - lowMark);
+            limit += QStringLiteral(" FETCH NEXT %1 ROWS ONLY").arg(highMark - lowMark);
     } else {
         if (highMark > 0)
             limit += QLatin1String(" LIMIT ") + QString::number(highMark - lowMark);
@@ -383,7 +383,7 @@ QDjangoQuery QDjangoQuerySetPrivate::aggregateQuery(const QDjangoWhere::Aggregat
     const QString where = resolvedWhere.sql(db);
     const QString limit = compiler.orderLimitSql(QStringList(), lowMark, highMark);
 
-    QString sql = QLatin1String("SELECT ") + aggregationToString(func)+"("+field+") "+"FROM " + compiler.fromSql();
+    QString sql = QLatin1String("SELECT ") + aggregationToString(func)+QLatin1Char('(')+field+QLatin1String(") ")+QLatin1String("FROM ") + compiler.fromSql();
     if (!where.isEmpty())
         sql += QLatin1String(" WHERE ") + where;
     sql += limit;

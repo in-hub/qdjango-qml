@@ -30,7 +30,7 @@
 static const char *connectionPrefix = "_qdjango_";
 
 QMap<QByteArray, QDjangoMetaModel> globalMetaModels = QMap<QByteArray, QDjangoMetaModel>();
-static QDjangoDatabase *globalDatabase = 0;
+static QDjangoDatabase *globalDatabase = nullptr;
 static QDjangoDatabase::DatabaseType globalDatabaseType = QDjangoDatabase::UnknownDB;
 static bool globalDebugEnabled = false;
 
@@ -59,7 +59,7 @@ void QDjangoDatabase::threadFinished()
 static void closeDatabase()
 {
     delete globalDatabase;
-    globalDatabase = 0;
+    globalDatabase = nullptr;
 }
 
 static QDjangoDatabase::DatabaseType getDatabaseType(QSqlDatabase &db)
@@ -75,15 +75,15 @@ static QDjangoDatabase::DatabaseType getDatabaseType(QSqlDatabase &db)
         return QDjangoDatabase::PostgreSQL;
     else if (driverName == QLatin1String("QODBC")) {
         QSqlQuery query(db);
-        if (query.exec("SELECT sqlite_version()"))
+        if (query.exec(QStringLiteral("SELECT sqlite_version()")))
             return QDjangoDatabase::SQLite;
 
-        if (query.exec("SELECT @@version") && query.next() &&
-            query.value(0).toString().contains("Microsoft SQL Server"))
+        if (query.exec(QStringLiteral("SELECT @@version")) && query.next() &&
+            query.value(0).toString().contains(QLatin1String("Microsoft SQL Server")))
                 return QDjangoDatabase::MSSqlServer;
 
-        if (query.exec("SELECT version()") && query.next()) {
-            if (query.value(0).toString().contains("PostgreSQL"))
+        if (query.exec(QStringLiteral("SELECT version()")) && query.next()) {
+            if (query.value(0).toString().contains(QLatin1String("PostgreSQL")))
                 return QDjangoDatabase::PostgreSQL;
             else
                 return QDjangoDatabase::MySqlServer;
@@ -98,7 +98,7 @@ static void initDatabase(QSqlDatabase db)
     if (databaseType == QDjangoDatabase::SQLite) {
         // enable foreign key constraint handling
         QDjangoQuery query(db);
-        query.prepare("PRAGMA foreign_keys=on");
+        query.prepare(QStringLiteral("PRAGMA foreign_keys=on"));
         query.exec();
     }
 }

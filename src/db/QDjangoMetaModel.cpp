@@ -32,7 +32,7 @@ static long string_hash(const QString &s)
         return 0;
 
     const QByteArray a = s.toLatin1();
-    unsigned char *p = (unsigned char *) a.constData();
+    const unsigned char *p = reinterpret_cast<const unsigned char *>( a.constData() );
     long x = *p << 7;
     for (int i = 0; i < a.size(); ++i)
         x = (1000003*x) ^ *p++;
@@ -48,7 +48,7 @@ static long stringlist_hash(const QStringList &l)
     foreach (const QString &s, l) {
         --len;
         x = (x ^ string_hash(s)) * mult;
-        mult += (long)(82520L + len + len);
+        mult += static_cast<long>(82520L + len + len);
     }
     x += 97531L;
     return (x == -1) ? -2 : x;
@@ -310,12 +310,12 @@ QDjangoMetaModel::QDjangoMetaModel(const QMetaObject *meta)
                     uniqueOption = stringToBool(value);
                 else if (key == QLatin1String("blank"))
                     blankOption = stringToBool(value);
-                else if (option.key() == "on_delete") {
-                    if (value.toLower() == "cascade")
+                else if (option.key() == QLatin1String("on_delete")) {
+                    if (value.toLower() == QLatin1String("cascade"))
                         deleteConstraint = Cascade;
-                    else if (value.toLower() == "set_null")
+                    else if (value.toLower() == QLatin1String("set_null"))
                         deleteConstraint = SetNull;
-                    else if (value.toLower() == "restrict")
+                    else if (value.toLower() == QLatin1String("restrict"))
                         deleteConstraint = Restrict;
                 }
             }
@@ -415,7 +415,7 @@ QDjangoMetaModel::QDjangoMetaModel(const QObject *object)
         }
 
         const auto dynProp = object->property( dynPropName );
-        const QString typeName = dynProp.typeName();
+        const QLatin1String typeName{dynProp.typeName()};
 
         // parse field options
         bool autoIncrementOption = false;
@@ -456,12 +456,12 @@ QDjangoMetaModel::QDjangoMetaModel(const QObject *object)
                     uniqueOption = stringToBool(value);
                 else if (key == QLatin1String("blank"))
                     blankOption = stringToBool(value);
-                else if (option.key() == "on_delete") {
-                    if (value.toLower() == "cascade")
+                else if (option.key() == QLatin1String("on_delete")) {
+                    if (value.toLower() == QLatin1String("cascade"))
                         deleteConstraint = Cascade;
-                    else if (value.toLower() == "set_null")
+                    else if (value.toLower() == QLatin1String("set_null"))
                         deleteConstraint = SetNull;
-                    else if (value.toLower() == "restrict")
+                    else if (value.toLower() == QLatin1String("restrict"))
                         deleteConstraint = Restrict;
                 }
             }
@@ -474,7 +474,7 @@ QDjangoMetaModel::QDjangoMetaModel(const QObject *object)
         // foreign field
         if (typeName.endsWith(QLatin1Char('*'))) {
             const QByteArray fkName = dynPropName;
-            const QByteArray fkModel = typeName.left(typeName.size() - 1).toLatin1();
+            const QByteArray fkModel = typeName.left(typeName.size() - 1).data();
             d->foreignFields.insert(fkName, fkModel);
 
             QDjangoMetaField field;
@@ -704,16 +704,16 @@ QStringList QDjangoMetaModel::createTableSql() const
                     );
 
                 if (field.d->deleteConstraint != NoAction) {
-                    constraint += " ON DELETE";
+                    constraint += QLatin1String(" ON DELETE");
                     switch (field.d->deleteConstraint) {
                     case Cascade:
-                        constraint += " CASCADE";
+                        constraint += QLatin1String(" CASCADE");
                         break;
                     case SetNull:
-                        constraint += " SET NULL";
+                        constraint += QLatin1String(" SET NULL");
                         break;
                     case Restrict:
-                        constraint += " RESTRICT";
+                        constraint += QLatin1String(" RESTRICT");
                         break;
                     default:
                         break;
@@ -733,16 +733,16 @@ QStringList QDjangoMetaModel::createTableSql() const
                 }
 
                 if (field.d->deleteConstraint != NoAction) {
-                    fieldSql += " ON DELETE";
+                    fieldSql += QLatin1String(" ON DELETE");
                     switch (field.d->deleteConstraint) {
                     case Cascade:
-                        fieldSql += " CASCADE";
+                        fieldSql += QLatin1String(" CASCADE");
                         break;
                     case SetNull:
-                        fieldSql += " SET NULL";
+                        fieldSql += QLatin1String(" SET NULL");
                         break;
                     case Restrict:
-                        fieldSql += " RESTRICT";
+                        fieldSql += QLatin1String(" RESTRICT");
                         break;
                     default:
                         break;
@@ -751,7 +751,7 @@ QStringList QDjangoMetaModel::createTableSql() const
             }
 
             if (databaseType == QDjangoDatabase::PostgreSQL)
-                fieldSql += " DEFERRABLE INITIALLY DEFERRED";
+                fieldSql += QLatin1String(" DEFERRABLE INITIALLY DEFERRED");
         }
         propSql << fieldSql;
     }
@@ -884,10 +884,10 @@ void QDjangoMetaModel::load(QObject *model, const QVariantList &properties, int 
         return;
     foreach (const QByteArray &fkName, d->foreignFields.keys())
     {
-        QString fkS(fkName);
+        QString fkS = QLatin1String(fkName);
         if ( relatedFields.contains(fkS) )
         {
-            QStringList nsl = relatedFields.filter(QRegExp("^" + fkS + "__")).replaceInStrings(QRegExp("^" + fkS + "__"),"");
+            QStringList nsl = relatedFields.filter(QRegExp(QLatin1Char('^') + fkS + QLatin1String("__"))).replaceInStrings(QRegExp(QLatin1Char('^') + fkS + QLatin1String("__")),QString());
             QObject *object = model->property(fkName + "_ptr").value<QObject*>();
             if (object)
             {

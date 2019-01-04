@@ -395,20 +395,20 @@ QString QDjangoWhere::toString() const
 {
     if (d->combine == QDjangoWherePrivate::NoCombine) {
         return QLatin1String("QDjangoWhere(")
-                  + "key=\"" + d->key + "\""
-                  + ", operation=\"" + QDjangoWherePrivate::operationToString(d->operation) + "\""
-                  + ", value=\"" + d->data.toString() + "\""
-                  + ", negate=" + (d->negate ? "true":"false")
-                  + ")";
+                  + QLatin1String("key=\"") + d->key + QLatin1Char('"')
+                  + QLatin1String(", operation=\"") + QDjangoWherePrivate::operationToString(d->operation) + QLatin1Char('"')
+                  + QLatin1String(", value=\"") + d->data.toString() + QLatin1Char('"')
+                  + QLatin1String(", negate=") + (d->negate ? QLatin1String("true"):QLatin1String("false"))
+                  + QLatin1Char(')');
     } else {
         QStringList bits;
         foreach (const QDjangoWhere &childWhere, d->children) {
             bits.append(childWhere.toString());
         }
         if (d->combine == QDjangoWherePrivate::OrCombine) {
-            return bits.join(" || ");
+            return bits.join(QLatin1String(" || "));
         } else {
-            return bits.join(" && ");
+            return bits.join(QLatin1String(" && "));
         }
     }
 }
