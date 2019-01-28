@@ -38,7 +38,7 @@ public:
     static bool dropTables();
 
     static QSqlDatabase database();
-    static void setDatabase(QSqlDatabase database);
+    static void setDatabase(QSqlDatabase database, bool skipInit = false);
 
     static bool isDebugEnabled();
     static void setDebugEnabled(bool enabled);

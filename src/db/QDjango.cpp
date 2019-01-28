@@ -196,8 +196,14 @@ QSqlDatabase QDjango::database()
 
     \sa database()
 */
-void QDjango::setDatabase(QSqlDatabase database)
+void QDjango::setDatabase(QSqlDatabase database, bool skipInit)
 {
+    if (skipInit && globalDatabase && globalDatabase->reference.driverName() == database.driverName())
+    {
+        globalDatabase->reference = database;
+        return;
+    }
+
     globalDatabaseType = getDatabaseType(database);
     if (globalDatabaseType == QDjangoDatabase::UnknownDB) {
         qWarning() << "Unsupported database driver" << database.driverName();
@@ -207,7 +213,10 @@ void QDjango::setDatabase(QSqlDatabase database)
         globalDatabase = new QDjangoDatabase();
         qAddPostRoutine(closeDatabase);
     }
-    initDatabase(database);
+    if (!skipInit)
+    {
+        initDatabase(database);
+    }
     globalDatabase->reference = database;
 }
 
