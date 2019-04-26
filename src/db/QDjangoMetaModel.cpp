@@ -249,7 +249,7 @@ QDjangoMetaModel::QDjangoMetaModel(const QMetaObject *meta)
         return;
 
     d->className = meta->className();
-    d->table = QString::fromLatin1(meta->className()).toLower();
+    d->table = QString::fromLatin1(meta->className());
 
     // parse table options
     const int optionsIndex = meta->indexOfClassInfo("__meta__");
@@ -388,7 +388,7 @@ QDjangoMetaModel::QDjangoMetaModel(const QObject *object)
     : d(new QDjangoMetaModelPrivate)
 {
     d->className = object->objectName().toUtf8();
-    d->table = object->objectName().toLower();
+    d->table = object->objectName();
 
     // parse table options
     const auto metaProp = object->property( "__meta__" );
