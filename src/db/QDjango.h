@@ -47,6 +47,7 @@ public:
     static QDjangoMetaModel registerModel();
 
     static QDjangoMetaModel registerModel(const QObject *object);
+    static void unregisterModel(const QObject *object);
 
 private:
     static QDjangoMetaModel registerModel(const QMetaObject *meta);

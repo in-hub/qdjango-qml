@@ -332,6 +332,14 @@ QDjangoMetaModel QDjango::registerModel(const QObject *object)
 }
 
 
+void QDjango::unregisterModel(const QObject* object)
+{
+    const auto name = object->objectName().toUtf8();
+    if (name.isEmpty() == false && globalMetaModels.contains(name))
+        globalMetaModels.remove(name);
+}
+
+
 QDjangoMetaModel QDjango::registerModel(const QMetaObject *meta)
 {
     const QByteArray name = meta->className();
