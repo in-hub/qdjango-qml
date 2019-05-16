@@ -29,7 +29,7 @@
 
 static const char *connectionPrefix = "_qdjango_";
 
-QMap<QByteArray, QDjangoMetaModel> globalMetaModels = QMap<QByteArray, QDjangoMetaModel>();
+static QMap<QByteArray, QDjangoMetaModel> globalMetaModels = QMap<QByteArray, QDjangoMetaModel>();
 static QDjangoDatabase *globalDatabase = nullptr;
 static QDjangoDatabase::DatabaseType globalDatabaseType = QDjangoDatabase::UnknownDB;
 static bool globalDebugEnabled = false;
