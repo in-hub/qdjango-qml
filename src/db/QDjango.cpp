@@ -73,7 +73,7 @@ static QDjangoDatabase::DatabaseType getDatabaseType(QSqlDatabase &db)
         return QDjangoDatabase::SQLite;
     else if (driverName == QLatin1String("QPSQL"))
         return QDjangoDatabase::PostgreSQL;
-    else if (driverName == QLatin1String("QODBC")) {
+    else if (driverName.startsWith(QLatin1String("QODBC"))) {
         QSqlQuery query(db);
         if (query.exec(QStringLiteral("SELECT sqlite_version()")))
             return QDjangoDatabase::SQLite;
