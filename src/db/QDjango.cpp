@@ -79,7 +79,7 @@ static QDjangoDatabase::DatabaseType getDatabaseType(QSqlDatabase &db)
             return QDjangoDatabase::SQLite;
 
         if (query.exec(QStringLiteral("SELECT @@version")) && query.next() &&
-            query.value(0).toString().contains(QLatin1String("Microsoft SQL Server")))
+            query.value(0).toString().contains(QLatin1String("Microsoft SQL")))
                 return QDjangoDatabase::MSSqlServer;
 
         if (query.exec(QStringLiteral("SELECT version()")) && query.next()) {
