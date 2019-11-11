@@ -989,6 +989,7 @@ bool QDjangoMetaModel::save(QObject *model) const
             foreach (const QDjangoMetaField &field, d->localFields) {
                 if (field.d->name != d->primaryKey) {
                     const QVariant value = model->property(field.d->name);
+                    if (value.type() == QVariant::Invalid) continue;
                     fields.insert(QString::fromLatin1(field.d->name), field.toDatabase(value));
                 }
             }
@@ -1005,6 +1006,7 @@ bool QDjangoMetaModel::save(QObject *model) const
     foreach (const QDjangoMetaField &field, d->localFields) {
         if (!field.d->autoIncrement) {
             const QVariant value = model->property(field.d->name);
+            if (value.type() == QVariant::Invalid) continue;
             fields.insert(field.name(), field.toDatabase(value));
         }
     }
