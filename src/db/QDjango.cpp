@@ -213,7 +213,7 @@ void QDjango::setDatabase(QSqlDatabase database, bool skipInit, int dbType)
         globalDatabaseType = getDatabaseType(database);
     }
 
-    if (globalDatabaseType == QDjangoDatabase::UnknownDB) {
+    if (database.isValid() && globalDatabaseType == QDjangoDatabase::UnknownDB) {
         qWarning() << "Unsupported database driver" << database.driverName();
     }
 
