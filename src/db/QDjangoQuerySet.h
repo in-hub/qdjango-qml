@@ -430,7 +430,7 @@ typename QDjangoQuerySet<T>::const_iterator QDjangoQuerySet<T>::end() const
 template <class T>
 QDjangoQuerySet<T> QDjangoQuerySet<T>::all() const
 {
-    QDjangoQuerySet<T> other( d->modelName() );
+    QDjangoQuerySet<T> other( d->modelName().constData() );
     other.d->lowMark = d->lowMark;
     other.d->highMark = d->highMark;
     other.d->orderBy = d->orderBy;
