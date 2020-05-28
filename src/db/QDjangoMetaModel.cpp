@@ -913,7 +913,7 @@ void QDjangoMetaModel::load(QObject *model, const QVariantList &properties, int 
 /*!
     Returns the foreign field mapping.
 */
-QMap<QByteArray, QByteArray> QDjangoMetaModel::foreignFields() const
+const QMap<QByteArray, QByteArray>& QDjangoMetaModel::foreignFields() const
 {
     return d->foreignFields;
 }
@@ -934,7 +934,7 @@ QDjangoMetaField QDjangoMetaModel::localField(const char *name) const
 /*!
     Returns the list of local fields.
 */
-QList<QDjangoMetaField> QDjangoMetaModel::localFields() const
+const QList<QDjangoMetaField>& QDjangoMetaModel::localFields() const
 {
     return d->localFields;
 }
@@ -942,7 +942,7 @@ QList<QDjangoMetaField> QDjangoMetaModel::localFields() const
 /*!
     Returns the name of the primary key for the current QDjangoMetaModel.
 */
-QByteArray QDjangoMetaModel::primaryKey() const
+const QByteArray& QDjangoMetaModel::primaryKey() const
 {
     return d->primaryKey;
 }

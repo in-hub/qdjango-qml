@@ -86,9 +86,9 @@ public:
 
     QByteArray className() const;
     QDjangoMetaField localField(const char *name) const;
-    QList<QDjangoMetaField> localFields() const;
-    QMap<QByteArray, QByteArray> foreignFields() const;
-    QByteArray primaryKey() const;
+    const QList<QDjangoMetaField>& localFields() const;
+    const QMap<QByteArray, QByteArray>& foreignFields() const;
+    const QByteArray& primaryKey() const;
     QString table() const;
 
 private:
