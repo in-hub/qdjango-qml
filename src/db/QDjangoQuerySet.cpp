@@ -150,12 +150,12 @@ QString QDjangoCompiler::fromSql()
             leftHandColumn = databaseColumn(name + QLatin1String("__pk"));
             rightHandColumn = databaseColumn(name + QLatin1String("_id"));
         }
-        from += QString::fromLatin1(" %1 %2 %3 ON %4 = %5")
-            .arg(ref.nullable ? QLatin1String("LEFT OUTER JOIN") : QLatin1String("INNER JOIN"))
-            .arg(driver->escapeIdentifier(ref.metaModel.table(), QSqlDriver::TableName))
-            .arg(ref.tableReference)
-            .arg(leftHandColumn)
-            .arg(rightHandColumn);
+        from += QString::fromLatin1(" %1 %2 %3 ON %4 = %5").arg(
+            ref.nullable ? QLatin1String("LEFT OUTER JOIN") : QLatin1String("INNER JOIN"),
+            driver->escapeIdentifier(ref.metaModel.table(), QSqlDriver::TableName),
+            ref.tableReference,
+            leftHandColumn,
+            rightHandColumn);
     }
     return from;
 }
