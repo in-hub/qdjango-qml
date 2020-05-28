@@ -433,8 +433,6 @@ QString QDjangoWherePrivate::operationToString(QDjangoWhere::Operation operation
     case QDjangoWhere::IsNull: return QLatin1String("IsNull");
     case QDjangoWhere::None:
     default:
-        return QLatin1String("");
+        return {};
     }
-
-    return QString();
 }
