@@ -46,7 +46,7 @@ class QDJANGO_DB_EXPORT QDjangoDatabase : public QObject
     Q_OBJECT
 
 public:
-    QDjangoDatabase(QObject *parent = 0);
+    QDjangoDatabase(QObject *parent = nullptr);
 
     enum DatabaseType {
         UnknownDB,

@@ -82,7 +82,7 @@ class QDJANGO_DB_EXPORT QDjangoModel : public QObject
     Q_CLASSINFO("pk", "ignore_field=true")
 
 public:
-    QDjangoModel(QObject *parent = 0);
+    QDjangoModel(QObject *parent = nullptr);
 
     QVariant pk() const;
     void setPk(const QVariant &pk);

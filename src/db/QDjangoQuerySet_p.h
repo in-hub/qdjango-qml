@@ -61,7 +61,7 @@ class QDJANGO_DB_EXPORT QDjangoCompiler
 public:
     QDjangoCompiler(const char *modelName, const QSqlDatabase &db);
     QString fromSql();
-    QStringList fieldNames(bool recurse, const QStringList *fields = 0, QDjangoMetaModel *metaModel = 0, const QString &modelPath = QString(), bool nullable = false);
+    QStringList fieldNames(bool recurse, const QStringList *fields = nullptr, QDjangoMetaModel *metaModel = nullptr, const QString &modelPath = QString(), bool nullable = false);
     QString orderLimitSql(const QStringList &orderBy, int lowMark, int highMark);
     void resolve(QDjangoWhere &where);
 
@@ -89,7 +89,7 @@ public:
     QDjangoWhere resolvedWhere(const QSqlDatabase &db) const;
     bool sqlDelete();
     bool sqlFetch();
-    bool sqlInsert(const QVariantMap &fields, QVariant *insertId = 0);
+    bool sqlInsert(const QVariantMap &fields, QVariant *insertId = nullptr);
     bool sqlLoad(QObject *model, int index);
     int sqlUpdate(const QVariantMap &fields);
     QList<QVariantMap> sqlValues(const QStringList &fields);

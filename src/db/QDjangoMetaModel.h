@@ -65,7 +65,7 @@ private:
 class QDJANGO_DB_EXPORT QDjangoMetaModel
 {
 public:
-    QDjangoMetaModel(const QMetaObject *model = 0);
+    QDjangoMetaModel(const QMetaObject *model = nullptr);
     QDjangoMetaModel(const QObject *model);
     QDjangoMetaModel(const QDjangoMetaModel &other);
     ~QDjangoMetaModel();

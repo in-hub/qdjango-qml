@@ -818,12 +818,12 @@ QObject *QDjangoMetaModel::foreignKey(const QObject *model, const char *name) co
     const QByteArray prop(name);
     if (!d->foreignFields.contains(prop)) {
         qWarning("QDjangoMetaModel cannot get foreign model for invalid key '%s'", name);
-        return 0;
+        return nullptr;
     }
 
     QObject *foreign = model->property(prop + "_ptr").value<QObject*>();
     if (!foreign)
-        return 0;
+        return nullptr;
 
     // if the foreign object was not loaded yet, do it now
     const QByteArray foreignClass = d->foreignFields[prop];
@@ -835,7 +835,7 @@ QObject *QDjangoMetaModel::foreignKey(const QObject *model, const char *name) co
         qs.addFilter(QDjangoWhere(QLatin1String("pk"), QDjangoWhere::Equals, foreignPk));
         qs.sqlFetch();
         if (qs.properties.size() != 1 || !qs.sqlLoad(foreign, 0))
-            return 0;
+            return nullptr;
     }
     return foreign;
 }

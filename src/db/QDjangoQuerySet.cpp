@@ -127,7 +127,7 @@ QStringList QDjangoCompiler::fieldNames(bool recurse, const QStringList *fields,
 
         if (fields == nullptr)
         {
-            columns += fieldNames(recurse, 0, &metaForeign, pathPrefix + QString::fromLatin1(fkName), nullableForeign);
+            columns += fieldNames(recurse, nullptr, &metaForeign, pathPrefix + QString::fromLatin1(fkName), nullableForeign);
         }
     }
     return columns;
