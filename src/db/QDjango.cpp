@@ -253,7 +253,7 @@ static void qdjango_topsort(const QByteArray &modelName, QHash<QByteArray, bool>
 {
     visited[modelName] = true;
     QDjangoMetaModel model = globalMetaModels[modelName];
-    foreach (const QByteArray &foreignModel, model.foreignFields().values()) {
+    for (const QByteArray &foreignModel : model.foreignFields()) {
         if (!visited[foreignModel])
             qdjango_topsort(foreignModel, visited, stack);
     }
@@ -267,12 +267,12 @@ static QStack<QDjangoMetaModel> qdjango_sorted_metamodels()
     stack.reserve(globalMetaModels.size());
     QHash<QByteArray, bool> visited;
     visited.reserve(globalMetaModels.size());
-    foreach (const QByteArray &model, globalMetaModels.keys())
-        visited[model] = false;
+    for (auto it = globalMetaModels.constBegin(), end = globalMetaModels.constEnd(); it != end; ++it )
+        visited[it.key()] = false;
 
-    foreach (const QByteArray &model, globalMetaModels.keys()) {
-        if (!visited[model])
-            qdjango_topsort(model, visited, stack);
+    for (auto it = globalMetaModels.constBegin(), end = globalMetaModels.constEnd(); it != end; ++it ) {
+        if (!visited[it.key()])
+            qdjango_topsort(it.key(), visited, stack);
     }
 
     return stack;
@@ -287,7 +287,7 @@ bool QDjango::createTables()
 {
     bool result = true;
     QStack<QDjangoMetaModel> stack = qdjango_sorted_metamodels();
-    foreach (const QDjangoMetaModel &model, stack) {
+    for (const QDjangoMetaModel &model : stack) {
         if (!model.createTable())
             result = false;
     }
@@ -322,9 +322,9 @@ QDjangoMetaModel QDjango::metaModel(const char *name)
         return globalMetaModels.value(name);
 
     // otherwise, try to find a model anyway
-    foreach (QByteArray modelName, globalMetaModels.keys()) {
-        if (qstricmp(name, modelName.data()) == 0)
-            return globalMetaModels.value(modelName);
+    for (auto it = globalMetaModels.constBegin(), end = globalMetaModels.constEnd(); it != end; ++it ) {
+        if (qstricmp(name, it.key().data()) == 0)
+            return globalMetaModels.value(it.key());
     }
 
     return QDjangoMetaModel();

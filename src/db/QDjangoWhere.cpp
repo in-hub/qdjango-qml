@@ -271,7 +271,7 @@ void QDjangoWhere::bindValues(QDjangoQuery &query) const
     } else if (d->operation != QDjangoWhere::None) {
         query.addBindValue(d->data);
     } else {
-        foreach (const QDjangoWhere &child, d->children)
+        for (const QDjangoWhere &child : d->children)
             child.bindValues(query);
     }
 }
@@ -369,7 +369,7 @@ QString QDjangoWhere::sql(const QSqlDatabase &db) const
                 return d->negate ? QLatin1String("1 != 0") : QString();
             } else {
                 QStringList bits;
-                foreach (const QDjangoWhere &child, d->children) {
+                for (const QDjangoWhere &child : d->children) {
                     QString atom = child.sql(db);
                     if (child.d->children.isEmpty())
                         bits << atom;
@@ -402,7 +402,7 @@ QString QDjangoWhere::toString() const
                   + QLatin1Char(')');
     } else {
         QStringList bits;
-        foreach (const QDjangoWhere &childWhere, d->children) {
+        for (const QDjangoWhere &childWhere : d->children) {
             bits.append(childWhere.toString());
         }
         if (d->combine == QDjangoWherePrivate::OrCombine) {
