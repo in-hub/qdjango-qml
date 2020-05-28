@@ -84,7 +84,7 @@ QString QDjangoCompiler::databaseColumn(const QString &name)
             reverseModelRefs[modelPath] = rev;
         } else {
             foreignModel = QDjango::metaModel(model.foreignFields()[fk]);
-            foreignNullable = model.localField(fk + QByteArray("_id")).isNullable();;
+            foreignNullable = model.localField(fk + QByteArray("_id")).isNullable();
         }
 
         // store reference
@@ -143,7 +143,7 @@ QString QDjangoCompiler::fromSql()
         QString leftHandColumn, rightHandColumn;
         if (reverseModelRefs.contains(name)) {
             const QDjangoReverseReference &rev = reverseModelRefs[name];
-            leftHandColumn = ref.tableReference + QLatin1Char('.') + driver->escapeIdentifier(rev.leftHandKey, QSqlDriver::FieldName);;
+            leftHandColumn = ref.tableReference + QLatin1Char('.') + driver->escapeIdentifier(rev.leftHandKey, QSqlDriver::FieldName);
             rightHandColumn = databaseColumn(rev.rightHandKey);
         } else {
             leftHandColumn = databaseColumn(name + QLatin1String("__pk"));

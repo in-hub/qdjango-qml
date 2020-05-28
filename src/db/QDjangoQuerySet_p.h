@@ -40,7 +40,7 @@ public:
         , metaModel(metaModel_)
         , nullable(nullable_)
     {
-    };
+    }
 
     QString tableReference;
     QDjangoMetaModel metaModel;

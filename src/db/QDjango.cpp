@@ -358,6 +358,6 @@ QDjangoMetaModel QDjango::registerModel(const QMetaObject *meta)
 
 QDjangoDatabase::DatabaseType QDjangoDatabase::databaseType(const QSqlDatabase &db)
 {
-    Q_UNUSED(db);
+    Q_UNUSED(db)
     return globalDatabaseType;
 }
