@@ -17,6 +17,7 @@
  */
 
 #include <QDebug>
+#include <QRegularExpression>
 #include <QSqlDriver>
 #include <QSqlRecord>
 
@@ -121,8 +122,8 @@ QStringList QDjangoCompiler::fieldNames(bool recurse, const QStringList *fields,
         QString fkS(QString::fromLatin1(fkName));
         if ( (fields != nullptr) && (fields->contains(fkS) ) )
         {
-            QStringList nsl = fields->filter(QRegExp(QLatin1String("^") + fkS + QLatin1String("__")));
-            nsl.replaceInStrings(QRegExp(QLatin1String("^") + fkS + QLatin1String("__")),QString());
+            QStringList nsl = fields->filter(QRegularExpression(QLatin1String("^") + fkS + QLatin1String("__")));
+            nsl.replaceInStrings(QRegularExpression(QLatin1String("^") + fkS + QLatin1String("__")),QString());
             columns += fieldNames(recurse, &nsl, &metaForeign, pathPrefix + QString::fromLatin1(fkName), nullableForeign);
         }
 

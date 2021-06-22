@@ -17,6 +17,7 @@
 
 #include <QDebug>
 #include <QMetaProperty>
+#include <QRegularExpression>
 #include <QSqlDriver>
 #include <QStringList>
 
@@ -861,7 +862,7 @@ void QDjangoMetaModel::setForeignKey(QObject *model, const char *name, QObject *
         return;
 
     // store the new pointer and update the foreign key
-    model->setProperty(prop + "_ptr", qVariantFromValue(value));
+    model->setProperty(prop + "_ptr", QVariant::fromValue(value));
     if (value) {
         const QDjangoMetaModel foreignMeta = QDjango::metaModel(d->foreignFields[prop]);
         model->setProperty(prop + "_id", value->property(foreignMeta.primaryKey()));
@@ -888,8 +889,8 @@ void QDjangoMetaModel::load(QObject *model, const QVariantList &properties, int 
         QString fkS = QLatin1String(fkName);
         if ( relatedFields.contains(fkS) )
         {
-            QStringList nsl = relatedFields.filter(QRegExp(QLatin1Char('^') + fkS + QLatin1String("__")));
-            nsl.replaceInStrings(QRegExp(QLatin1Char('^') + fkS + QLatin1String("__")),QString());
+            QStringList nsl = relatedFields.filter(QRegularExpression(QLatin1Char('^') + fkS + QLatin1String("__")));
+            nsl.replaceInStrings(QRegularExpression(QLatin1Char('^') + fkS + QLatin1String("__")),QString());
             QObject *object = model->property(fkName + "_ptr").value<QObject*>();
             if (object)
             {

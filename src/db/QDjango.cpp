@@ -126,12 +126,21 @@ bool QDjangoQuery::exec()
 {
     if (globalDebugEnabled) {
         qDebug() << "SQL query" << lastQuery();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+		const auto bv = boundValues();
+		for (int i = 0; i < bv.size(); ++i)
+		{
+			qDebug() << "SQL   " << i << "="
+					 << bv[i].toString().toLatin1().data();
+		}
+#else
         QMapIterator<QString, QVariant> i(boundValues());
         while (i.hasNext()) {
             i.next();
             qDebug() << "SQL   " << i.key().toLatin1().data() << "="
                      << i.value().toString().toLatin1().data();
         }
+#endif
     }
     if (!QSqlQuery::exec()) {
         if (globalDebugEnabled)
