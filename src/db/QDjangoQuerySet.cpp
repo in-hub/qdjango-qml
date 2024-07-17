@@ -563,7 +563,7 @@ QList<QVariantMap> QDjangoQuerySetPrivate::sqlValues(const QStringList &fields)
     }
 
     // extract values
-    for (const QVariantList &props : qAsConst(properties)) {
+    for (const QVariantList &props : std::as_const(properties)) {
         QVariantMap map;
         QMap<QString, int>::const_iterator i;
         for (i = fieldPos.constBegin(); i != fieldPos.constEnd(); ++i)
@@ -601,9 +601,9 @@ QList<QVariantList> QDjangoQuerySetPrivate::sqlValuesList(const QStringList &fie
     }
 
     // extract values
-    for (const QVariantList &props : qAsConst(properties)) {
+    for (const QVariantList &props : std::as_const(properties)) {
         QVariantList list;
-        for (int pos : qAsConst(fieldPos))
+        for (int pos : std::as_const(fieldPos))
             list << props.at(pos);
         values.append(list);
     }
